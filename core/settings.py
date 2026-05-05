@@ -154,4 +154,4 @@ CHANNEL_LAYERS = {
     }
 }
 
-AUTH_USER_MODEL = 'login.MyUser '
+AUTH_USER_MODEL = 'login.MyUser'
