@@ -27,7 +27,8 @@ DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ['0.0.0.0',
                  'localhost',
-                 '127.0.0.1']
+                 '127.0.0.1',
+                 'nneural.online']
 
 
 # Application definition
@@ -153,4 +154,4 @@ CHANNEL_LAYERS = {
     }
 }
 
-AUTH_USER_MODEL = 'login.MyUser'
+AUTH_USER_MODEL = 'login.MyUser '
