@@ -1,0 +1,212 @@
+{% extends "wrapper.html" %}
+
+{% block title %}Подтверждение кода{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card bg-dark text-white border-secondary">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-envelope-check fs-1 text-primary"></i>
+                        <h3 class="mt-3">Подтверждение кода</h3>
+                        <p class="text-muted">
+                            На указанный email отправлен 6-значный код подтверждения.
+                            Пожалуйста, введите его ниже.
+                        </p>
+                    </div>
+
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    {% if success %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        {{ success }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    {% if info %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        {{ info }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" action="">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="verification_code" class="form-label mb-2">Код подтверждения</label>
+                            <input type="text"
+                                   class="form-control form-control-lg text-center {% if error %}is-invalid{% endif %}"
+                                   id="verification_code"
+                                   name="verification_code"
+                                   placeholder="000000"
+                                   maxlength="6"
+                                   pattern="[0-9]{6}"
+                                   inputmode="numeric"
+                                   required
+                                   autofocus>
+                            <div class="form-text text-muted text-center">
+                                Введите 6-значный код, полученный по электронной почте
+                            </div>
+                            {% if error %}
+                            <div class="invalid-feedback d-block text-center">
+                                {{ error }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <script>
+                            const codeInput = document.getElementById('verification_code');
+                            const form = document.querySelector('form');
+                            const feedback = document.getElementById('code-feedback');
+
+                            // Функция валидации
+                            function validateCode() {
+                                const code = codeInput.value;
+                                const isValid = /^\d{6}$/.test(code);
+
+                                if (!isValid && code.length > 0) {
+                                    codeInput.classList.add('is-invalid');
+                                    feedback.textContent = 'Код должен содержать ровно 6 цифр';
+                                    return false;
+                                } else if (code.length === 0) {
+                                    codeInput.classList.remove('is-invalid');
+                                    return false;
+                                } else {
+                                    codeInput.classList.remove('is-invalid');
+                                    return true;
+                                }
+                            }
+
+                            // Валидация при вводе
+                            codeInput.addEventListener('input', function(e) {
+                                // Разрешаем только цифры
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                                validateCode();
+                            });
+
+                            // Валидация при потере фокуса
+                            codeInput.addEventListener('blur', validateCode);
+
+                            // Валидация при отправке формы
+                            form.addEventListener('submit', function(e) {
+                                const code = codeInput.value;
+
+                                if (!/^\d{6}$/.test(code)) {
+                                    e.preventDefault();
+                                    codeInput.classList.add('is-invalid');
+                                    feedback.textContent = 'Введите корректный 6-значный код';
+
+                                    // Анимация встряхивания
+                                    codeInput.style.animation = 'shake 0.5s';
+                                    setTimeout(() => {
+                                        codeInput.style.animation = '';
+                                    }, 500);
+
+                                    return false;
+                                }
+
+                                return true;
+                            });
+
+                            // Добавляем CSS анимацию для встряхивания
+                            const style = document.createElement('style');
+                            style.textContent = `
+                                @keyframes shake {
+                                    0%, 100% { transform: translateX(0); }
+                                    25% { transform: translateX(-5px); }
+                                    75% { transform: translateX(5px); }
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        </script>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg me-2"></i>Подтвердить
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4 border-secondary">
+
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Не получили код?</p>
+                        <form method="post" action="" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="resend_code" value="1">
+                            <button type="submit" class="btn btn-link text-decoration-none p-0">
+                                <i class="bi bi-arrow-repeat me-1"></i>Отправить код повторно
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'login' %}" class="text-decoration-none text-muted">
+                    <i class="bi bi-arrow-left me-1"></i>Вернуться ко входу
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    /* Стили для более удобного ввода кода */
+    #verification_code {
+        font-size: 2rem;
+        letter-spacing: 0.5rem;
+        font-family: monospace;
+        background-color: #2a004d;
+        border-color: #4a0066;
+        color: white;
+    }
+
+    #verification_code:focus {
+        background-color: #2a004d;
+        border-color: #6f42c1;
+        box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25);
+        color: white;
+    }
+
+    #verification_code.is-invalid {
+        border-color: #dc3545;
+    }
+
+    #verification_code.is-invalid:focus {
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    /* Адаптация для мобильных устройств */
+    @media (max-width: 768px) {
+        #verification_code {
+            font-size: 1.5rem;
+            letter-spacing: 0.3rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+
+    /* Стили для кнопки повторной отправки */
+    .btn-link {
+        color: #0d6efd;
+    }
+
+    .btn-link:hover {
+        color: #0a58ca;
+    }
+</style>
+{% endblock %}

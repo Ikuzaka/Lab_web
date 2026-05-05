@@ -1,0 +1,131 @@
+{% extends 'wrapper.html' %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+    {% for item in products %}
+    <div class="col">
+    <div class="card h-100 position-relative">
+        <button class="btn btn-light btn-sm like-button position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+                data-product-id="{{ item.id }}"
+                data-is-liked="{% if request.user in item.favorite_by.all %}true{% else %}false{% endif %}"
+                style="z-index: 10; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <span class="like-icon" style="font-size: 18px; transition: transform 0.2s ease;">
+                {% if request.user in item.favorite_by.all %}❤️{% else %}🤍{% endif %}
+            </span>
+            <span class="like-count ms-1" style="font-size: 12px; font-weight: bold;">{{ item.favorites }}</span>
+        </button>
+        <img src="{{ item.image.url }}"
+             class="card-img-top"
+             alt="{{ item.name }}"
+             style="max-height: 190px; object-fit: cover;">
+
+        <div class="card-body d-flex flex-column p-4">
+            <h5 class="card-title fs-6 mb-3">{{ item.name }}</h5>
+            <p class="card-text flex-grow-1 small text-muted mb-4">{{ item.about|truncatechars:80 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0">{{ item.cost }}</span>
+                <a href="#" class="btn btn-primary btn-sm">Купить</a>
+            </div>
+        </div>
+     </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButtons = document.querySelectorAll('.like-button');
+
+
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const likeIcon = this.querySelector('.like-icon');
+            const likeCountSpan = this.querySelector('.like-count');
+
+            fetch("{% url 'catalog:toggle_favorite' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    likeCountSpan.textContent = data.favorites_count;
+                    if (data.is_favorited) {
+                        this.dataset.isLiked = 'true';
+                        likeIcon.innerHTML = '❤️';
+                    } else {
+                        this.dataset.isLiked = 'false';
+                        likeIcon.innerHTML = '🤍';
+                    }
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            });
+        });
+    });
+
+
+    function updateLikes() {
+        // Замени 'catalog:get_likes' на правильное имя твоего url
+        fetch("{% url 'catalog:get_likes' %}")
+            .then(response => response.json())
+            .then(data => {
+                // data это объект вида {"1": 10, "2": 5}
+                likeButtons.forEach(button => {
+                    const id = button.dataset.productId;
+                    if (data[id] !== undefined) {
+                        const countSpan = button.querySelector('.like-count');
+                        countSpan.textContent = data[id];
+                    }
+                });
+            })
+            .catch(err => console.error('Polling error:', err));
+    }
+
+
+    setInterval(updateLikes, 2000);
+});
+</script>
+
+<style>
+.like-button {
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.like-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.like-button:active {
+    transform: scale(0.95);
+}
+
+/* Стиль для кнопки с лайком */
+.like-button[data-is-liked="true"] {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.like-button[data-is-liked="true"] .like-icon,
+.like-button[data-is-liked="true"] .like-count {
+    color: white;
+}
+
+.like-button[data-is-liked="false"] .like-icon {
+    color: #dc3545;
+}
+</style>
+
+{% endblock %}

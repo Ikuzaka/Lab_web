@@ -1,0 +1,70 @@
+{% extends 'wrapper.html' %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+<form class="row g-3 needs-validation" method="POST" novalidate>
+  {% csrf_token %}
+  <div class="col-md-4">
+    <label for="validationName" class="form-label">Имя</label>
+    <input type="text" class="form-control" id="validationName" name="{{ form.first_name.name }}"  required>
+    <div class="valid-feedback">
+      Все хорошо!
+    </div>
+    <div class="invalid-feedback">
+     Должно быть с большой буквы!
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="validationFamily" class="form-label">Фамилия</label>
+    <input type="text" class="form-control" id="validationFamily" name="{{ form.last_name.name }}" required>
+    <div class="valid-feedback">
+      Все хорошо!
+    </div>
+    <div class="invalid-feedback">
+     Должна быть с большой буквы!
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <label for="validationPhone" class="form-label">Номер телефона</label>
+    <input type="text" class="form-control" id="validationPhone"  name="{{ form.phone.name }}" value="+7" maxlength="12" required>
+    <div class="valid-feedback">
+      Все хорошо!
+    </div>
+    <div class="invalid-feedback">
+     Укажите действующий номер телефона.
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="validationCustom04" class="form-label">Город</label>
+    <select class="form-select" id="validationCustom04" required>
+      <option selected disabled value="">Выберите...</option>
+      <option>Москва</option>
+      <option>Москва (г.Зеленоград)</option>
+      <option>...</option>
+    </select>
+    <div class="invalid-feedback">
+      Пожалуйста, выберите корректный город.
+    </div>
+  </div>
+  </div>
+    <div class="col-md-12">
+    <label for="validationText" class="form-label">Текст обращения</label>
+    <textarea class="form-control"  id="validationText" name="{{ form.text.name }}" rows="6" required></textarea>
+    <div class="invalid-feedback">
+      Заполните поле, 10 символов!
+    </div>
+    <div class="valid-feedback">
+      Всё хорошо!
+    </div>
+  </div>
+
+
+  <div class="col-13">
+    <button class="btn btn-primary" type="submit">Отправить форму</button>
+  </div>
+</form>
+{% load static %}
+<script src="{% static 'feedback/js/feedback.js' %}"></script>
+{% endblock %}
