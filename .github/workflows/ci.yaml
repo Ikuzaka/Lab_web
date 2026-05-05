@@ -14,4 +14,4 @@ jobs:
 
       - name: Run tests
         # Запускаем тесты внутри собранного контейнера
-        run: docker compose run django python manage.py test
+        run: docker compose run web python manage.py test
