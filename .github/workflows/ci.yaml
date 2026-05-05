@@ -1,0 +1,17 @@
+name: CI for Django with Docker Compose
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build images
+        # Собираем образы, описанные в docker-compose.yml
+        run: docker compose build
+
+      - name: Run tests
+        # Запускаем тесты внутри собранного контейнера
+        run: docker compose run django python manage.py test
