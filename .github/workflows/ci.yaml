@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create environment
-        uses: |
+        run: |
           echo "DB_HOST=${{ vars.DB_HOST }}" >> .env
           echo "DB_PORT=${{ vars.DB_PORT }}" >> .env
           echo "DEBUG=${{ vars.DEBUG }}" >> .env
