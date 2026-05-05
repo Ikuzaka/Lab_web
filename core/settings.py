@@ -15,6 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO','https')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -28,10 +29,16 @@ DEBUG = os.environ.get('DEBUG')
 ALLOWED_HOSTS = ['0.0.0.0',
                  'localhost',
                  '127.0.0.1',
-                 'nneural.online']
+                 'nneural.online',
+                 'www.nneural.online',]
 
 
 # Application definition
+
+CSRF_TRUSTED_ORIGINS=[
+    "https://nneural.online",
+    "https://www.nneural.online",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
